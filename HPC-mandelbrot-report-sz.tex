@@ -501,7 +501,7 @@ The comparative analysis between G++ and AOCC compilers reveals nuanced differen
 \begin{itemize}
 	\item \textbf{AOCC Advantages:} AOCC's enhanced performance, demonstrating a 38-47\% speedup over G++, can be attributed to its optimized code generation and superior exploitation of the CPU's SIMD (Single Instruction, Multiple Data) capabilities in the latest compiler version (AOCC-compiler 5.0.0, Clang-based 17.0.6, September 24, 2024).
 	\item \textbf{G++ Strengths:} While AOCC outperforms G++ in this benchmark, G++ remains a robust and widely-supported compiler with extensive optimization flags and a strong community, making it versatile for various computational scenarios. There is a point that needs to be stated that G++ did not allow for certain flag naming lie -DDYNAMIC_SCHED and needed to be changed into SCHEDULE_DYNAMIC. This should be kept in mind that when trying out different compilers certain flags might not be supported.
-	\item \textvf{Versioning}: This is to note that the GCC/G++ 13.3.0 compiler used in this study is a recent version, which may not fully leverage the latest hardware features of the AMD Ryzen 7 4800H CPU.
+	\item \textbf{Versioning}: This is to note that the GCC/G++ 13.3.0 compiler used in this study is a recent version, which may not fully leverage the latest hardware features of the AMD Ryzen 7 4800H CPU.
 	\item \textbf{Future Considerations:} Further exploration with different optimization flags, benchmarking on diverse hardware configurations, and evaluating performance across other computational tasks could provide deeper insights into the compilers' capabilities.
 \end{itemize}
 
