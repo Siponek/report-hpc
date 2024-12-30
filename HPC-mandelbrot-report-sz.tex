@@ -499,15 +499,17 @@ The comparative analysis between G++ and AOCC compilers reveals nuanced differen
 % \item GCC/G++ 13.3.0 (May 21, 2024)
 % \item AOCC-compiler 5.0.0 (Clang based 17.0.6, September 24 2024)
 \begin{itemize}
-	\item \textbf{AOCC Advantages:} AOCC's enhanced performance, demonstrating a 38-47\% speedup over G++, can be attributed to its optimized code generation and superior exploitation of the CPU's SIMD (Single Instruction, Multiple Data) capabilities in the latest compiler version (AOCC-compiler 5.0.0, Clang-based 17.0.6, September 24, 2024).
-	\item \textbf{G++ Strengths:} While AOCC outperforms G++ in this benchmark, G++ remains a robust and widely-supported compiler with extensive optimization flags and a strong community, making it versatile for various computational scenarios. There is a point that needs to be stated that G++ did not allow for certain flag naming lie -DDYNAMIC_SCHED and needed to be changed into SCHEDULE_DYNAMIC. This should be kept in mind that when trying out different compilers certain flags might not be supported.
-	\item \textbf{Versioning}: This is to note that the GCC/G++ 13.3.0 compiler used in this study is a recent version, which may not fully leverage the latest hardware features of the AMD Ryzen 7 4800H CPU.
-	\item \textbf{Future Considerations:} Further exploration with different optimization flags, benchmarking on diverse hardware configurations, and evaluating performance across other computational tasks could provide deeper insights into the compilers' capabilities.
-\end{itemize}
+	\item \textbf{AOCC Advantages:} AOCC demonstrates enhanced performance, achieving a 38-47\% speedup over G++. This improvement can be attributed to its optimized code generation and superior exploitation of the CPU's SIMD (Single Instruction, Multiple Data) capabilities, particularly in the latest compiler version (AOCC-compiler 5.0.0, Clang-based 17.0.6, released on September 24, 2024).
 
+	\item \textbf{G++ Strengths:} While AOCC outperforms G++ in this benchmark, G++ remains a robust and widely-supported compiler with extensive optimization flags and a strong community, making it versatile for various computational scenarios. However, it is important to note that G++ does not support certain flag naming conventions, such as `\texttt{-DDYNAMIC\_SCHED}`, which had to be changed to `\texttt{-DSCHEDULE\_DYNAMIC}`. This highlights the need to adapt flag names when switching between different compilers, as not all flags may be supported uniformly.
+
+	\item \textbf{Versioning:} It is noteworthy that the GCC/G++ version 13.3.0 used in this study is a recent release. Despite its recency, it may not fully leverage the latest hardware features of the AMD Ryzen 7 4800H CPU, potentially limiting performance gains that could be achieved with future compiler updates.
+
+	\item \textbf{Future Considerations:} Further exploration is recommended, including experimenting with different optimization flags, benchmarking on diverse hardware configurations, running more test batches to achieve statistically significant means, and evaluating performance across other computational tasks. These steps could provide deeper insights into the compilers' capabilities and uncover additional optimization opportunities.
+\end{itemize}
 \subsection{OpenMP Execution}
 
-OpenMP was employed to exploit shared-memory parallelism in the Mandelbrot Set computations. This subsection presents the performance analysis of the OpeDifferent Thread CountsnMP implementation, focusing on execution times, speedup comparisons, scheduling strategies, and scalability with varying numbers of threads.
+OpenMP was employed to exploit shared-memory parallelism in the Mandelbrot Set computations. This subsection presents the performance analysis of the Open Multi-Processing implementation, focusing on execution times, speedup comparisons, scheduling strategies, and scalability with varying numbers of threads.
 
 \subsubsection{Single-Thread Performance}
 
@@ -529,6 +531,7 @@ To quantify the overhead introduced by OpenMP, a speedup comparison between the 
 
 \begin{figure}[H]
 	\centering
+	\captionsetup{justification=centering, width=.8\linewidth}
 	\includegraphics[width=\textwidth]{./img/mandelbrot_openmp_1_thread_speedup_heatmap.png}
 	\caption{Speedup Comparison between Sequential Execution and OpenMP Execution with One Thread.}
 	\label{fig:mandelbrot_openMP_1_thread_speedup}
@@ -601,16 +604,27 @@ Different OpenMP scheduling strategies can significantly influence the performan
 		\label{tab:performance_tables}
 	\end{adjustwidth}
 \end{table}
+\begin{figure}[H]
+	\centering
+	\captionsetup{justification=centering, width=.8\linewidth}
+	\includegraphics[width=\textwidth]{./img/mandelbrot_openmp_scheduling_types_plot.png}
+	\caption{Execution Times Plot for OpenMP Mandelbrot Computations with Various Scheduling Types and Increasing Threads.}
+	\label{fig:mandelbrot_openMP_scheduling_types_speedup}
+\end{figure}
 
 \begin{figure}[H]
 	\centering
 	\captionsetup{justification=centering, width=.8\linewidth}
 	\includegraphics[width=\textwidth]{./img/mandelbrot_openMP_scheduling_types_heatmap_speedup.png}
-	\caption{Execution Times for OpenMP Mandelbrot Computations with Various Scheduling Types and Increasing Threads.}
+	\caption{Execution Times Heatmap for OpenMP Mandelbrot Computations with Various Scheduling Types and Increasing Threads.}
 	\label{fig:mandelbrot_openMP_scheduling_types_heatmap_speedup}
 \end{figure}
 
-Dynamic scheduling demonstrates superior performance over static and runtime approaches across thread configurations. While Guided scheduling shows comparable efficiency and performs marginally better with 4 threads, Dynamic scheduling maintains better performance scaling at 16 threads, indicating better adaptability to increased parallelism.
+
+The performance analysis of OpenMP scheduling strategies reveals that the runtime scheduling strategy excels when utilizing two threads. However, as the number of threads increases to four and eight, the guided scheduling strategy becomes the most efficient approach. When scaling up to sixteen threads, dynamic scheduling marginally outperforms guided scheduling.
+
+Overall, dynamic scheduling consistently surpasses both static and runtime scheduling strategies across various thread configurations. While guided scheduling demonstrates comparable efficiency and performs slightly better with four threads, dynamic scheduling maintains superior performance scaling at sixteen threads. This highlights dynamic scheduling's enhanced adaptability to increased parallelism, ensuring more effective utilization of computational resources as the level of concurrency grows.
+
 
 \subsubsection{Scalability and Speedup with Multiple Threads}
 
@@ -669,14 +683,14 @@ The performance of the CUDA implementation was evaluated by comparing its execut
 \begin{table}[H]
 	\captionsetup{justification=centering, width=.8\linewidth}
 	\centering
-	\caption{CUDA Mandelbrot Program Performance}
-	\label{tab:cuda_performance}
 
 	\rowcolors{2}{gray!25}{white} % Apply striped rows starting from the second row
 	\begin{adjustbox}{max width=\textwidth}
 		\input{./tables/table_cuda_performance.tex}
 	\end{adjustbox}
-	\rowcolors{1}{}{ } % Reset row colors
+	\rowcolors{1}{}{ }
+	\caption{CUDA Mandelbrot Program Performance with Varying Thread Block Sizes.}
+	\label{tab:cuda_performance}
 \end{table}
 
 
@@ -723,7 +737,7 @@ __global__ void mandelbrotKernel(int *image, double step, int minX,
 
 \subsubsection{Performance Insights}
 
-The CUDA implementation demonstrates substantial speedup, especially when the GPU is fully utilized with a high number of threads. According to Amdahl's Law, the theoretical maximum speedup is limited by the serial portion of the computation. However, in this scenario, the parallel portion dominates, allowing the CUDA implementation to achieve near-linear speedup as the number of threads increases.
+The CUDA implementation demonstrates substantial speedup, especially when the GPU is fully utilized with a high number of threads. According to Amdahl's Law, the theoretical maximum speedup is limited by the serial portion of the computation. However, in this scenario, the parallel portion dominates, allowing the CUDA implementation to achieve near-linear speedup as the number of threads increases up to 64 threads in a block.
 
 \begin{figure}[H]
 	\captionsetup{justification=centering, width=.8\linewidth}
@@ -733,22 +747,42 @@ The CUDA implementation demonstrates substantial speedup, especially when the GP
 	\label{fig:mandelbrot_cuda_speedup_vs_threads_amdahl}
 \end{figure}
 
-The plot in Figure~\ref{fig:mandelbrot_cuda_speedup_vs_threads_amdahl} showcases the speedup achieved by the CUDA implementation relative to the sequential execution. As the number of CUDA threads increases from 4 to 1024, the speedup grows proportionally, highlighting the GPU's capacity to handle extensive parallel workloads effectively.
+The plot in Figure~\ref{fig:mandelbrot_cuda_speedup_vs_threads_amdahl} showcases the speedup achieved by the CUDA implementation relative to the sequential execution. As the number of CUDA threads in block increases from 4 to 64, the speedup grows proportionally, highlighting the GPU's capacity to handle extensive parallel workloads effectively. However starting from 64 threads, the speedup growth rate slows down, and eventually flatlines indicating diminishing returns due to hardware limitations or memory bandwidth constraints.
 
-\subsubsection{Conclusion of CUDA Results}
+\subsubsection{Performance Plateau Beyond 64 Threads per Block}
 
-The CUDA implementation of the Mandelbrot Set computation effectively harnesses the parallel processing power of the NVIDIA GeForce RTX 2060 GPU, achieving substantial speedup compared to sequential execution. By scaling the number of CUDA threads, the implementation demonstrates excellent scalability and efficiency, making it a powerful tool for generating high-resolution fractal images with a large number of iterations. The ability to push the GPU to its computational limits results in impressive performance gains, validating the efficacy of GPU acceleration in high-performance computing applications.
+While the CUDA implementation of the Mandelbrot Set computation exhibits nearly linear performance improvements as the number of threads per block increases from 4 to 64, a noticeable plateau occurs when the thread count exceeds 64. This behavior can be attributed to several factors inherent to GPU architecture and CUDA's execution model:
+
+\begin{itemize}
+	\item \textbf{Warp Size Constraints:} NVIDIA GPUs execute threads in groups called warps, typically consisting of 32 threads each. When the number of threads per block is a multiple of the warp size (e.g., 32, 64), the GPU can efficiently schedule and execute these warps without idle threads. However, beyond 64 threads per block, additional threads may not align optimally with warp boundaries, leading to underutilization of GPU resources and diminishing returns in performance.
+
+	\item \textbf{Resource Allocation Limits:} Each thread block consumes a portion of the GPU's resources, including registers and shared memory. As the number of threads per block increases, the per-thread resource allocation decreases, potentially leading to resource contention. This contention can limit the number of active warps and reduce the GPU's ability to hide memory latency through concurrent execution.
+
+	\item \textbf{Occupancy Saturation:} GPU occupancy, defined as the ratio of active warps to the maximum number of possible active warps, plays a crucial role in performance. Up to 64 threads per block, increasing thread count enhances occupancy by better utilizing the available CUDA cores and hiding latency. However, beyond this threshold, occupancy may saturate, meaning that adding more threads does not proportionally increase the number of active warps, thereby limiting further speedup.
+
+	\item \textbf{Memory Bandwidth and Latency:} As thread blocks become larger, the demand on memory bandwidth increases. Beyond a certain point, the GPU's memory subsystem may become a bottleneck, preventing additional threads from accessing data efficiently. This bottleneck constrains the ability to achieve higher speedups despite the increased thread count.
+
+	\item \textbf{Thread Divergence:} Larger thread blocks can exacerbate thread divergence, where threads within the same warp follow different execution paths. Divergence reduces the efficiency of warp execution, as divergent threads serialize their operations, thereby diminishing the benefits of increased parallelism.
+\end{itemize}
+
+These factors collectively contribute to the observed performance plateau beyond 64 threads per block. To maximize CUDA performance, it is essential to balance the number of threads per block with the GPU's architectural constraints, ensuring optimal warp utilization, resource allocation, and memory access patterns. Future optimizations could explore adaptive thread block sizing based on specific hardware characteristics and computational workloads to further enhance scalability and efficiency.
+
+\subsubsection{Conclusion of CUDA Performance Analysis}
+
+The CUDA implementation demonstrates substantial speedup when scaling the number of threads per block up to 64, effectively leveraging the GPU's parallel processing capabilities. However, beyond this point, performance gains plateau due to architectural limitations such as warp size constraints, resource allocation limits, and occupancy saturation. Understanding these factors is crucial for optimizing CUDA applications, ensuring that thread configurations align with the GPU's execution model to achieve maximal performance benefits.
 
 \subsubsection{Summary of CUDA Results}
 
 The CUDA benchmarks reveal the following key insights:
 
 \begin{itemize}
-	\item \textbf{Scalability:} The CUDA implementation scales effectively with the number of threads, achieving significant speedup as the thread count increases.
-	\item \textbf{Performance Gains:} Pushing the GPU to its limits with high thread counts results in much larger speedup compared to sequential execution.
-	\item \textbf{Optimization Potential:} Further optimizations, such as memory management and kernel tuning, could enhance performance even more.
-	\item \textbf{Parallel Efficiency:} The highly parallel nature of the Mandelbrot computation aligns well with the GPU architecture, maximizing computational throughput.
+	\item \textbf{Scalability:} The CUDA implementation scales effectively with the number of threads, achieving significant speedup as the thread count increases. However, this scalability plateaus beyond a certain threshold, indicating diminishing returns with very high block thread counts.
+
+	\item \textbf{Performance Gains:} Pushing the GPU to its limits with high thread counts results in substantial speedup compared to sequential execution. Nevertheless, the CUDA implementation falls short of the OpenMP implementation utilizing 16 threads on the AMD CPU. This discrepancy may stem from the CUDA kernel's use of \texttt{cuComplex} and \texttt{cuCmul}, which could introduce unnecessary overhead and inhibit the utilization of fused multiply-add (FMA) operations. Optimizing these aspects could bridge the performance gap between CUDA and OpenMP. To put it simply these functions guarantee correct complex number arithmetic behavior, while when using openMP the compiler runs fast arithmetic hack resulting in perfomance increase at the cost of accuracy.
+
+	\item \textbf{Parallel Efficiency:} The highly parallel nature of the Mandelbrot computation aligns well with GPU architecture, maximizing computational throughput. Efficient thread management and optimal kernel configuration ensure that the GPU resources are fully exploited, leading to improved performance.
 \end{itemize}
+
 
 \subsection{MPI Distributed Computing}
 
@@ -756,13 +790,13 @@ The Message Passing Interface (MPI) was utilized to implement distributed-memory
 
 \subsubsection{Implementation Overview}
 
-The MPI implementation was developed using the \texttt{mpiicpc} compiler, which supports parallel execution across multiple hosts. The core strategy involved distributing the Mandelbrot computation tasks among various MPI processes, each potentially utilizing multiple threads via OpenMP for intra-process parallelism. The Makefile targets \texttt{compile-mpi} and \texttt{run-mpi} were employed to compile and execute the MPI-based Mandelbrot program. The benchmarking focused on varying the number of MPI processes and observing the corresponding speedup relative to the sequential execution.
+The MPI implementation was developed using the \texttt{mpiicpc} compiler, which supports parallel execution across multiple hosts. The core strategy involved distributing the Mandelbrot computation tasks among various MPI processes, each potentially utilizing multiple threads via OpenMP for intra-process parallelism. The Makefile targets \texttt{compile-mpi} and \texttt{run-mpi} were employed to compile and execute the MPI-based Mandelbrot program. The benchmarking focused on varying the number of MPI processes and observing the corresponding speedup relative to the sequential execution. At the time of benchmarking, 7 nodes were available for distributed computing, however to showcase the scalability of the implementation, the number of nodes was limited to 4.
 
 \subsubsection{Issue with Thread Management}
 
 During the implementation, an unintended interaction between MPI processes and OpenMP threads arose. Specifically, the use of \texttt{omp\_get\_max\_threads()} within the MPI code led to each MPI process spawning all available threads on the host machine. For instance, on a machine with a processor supporting 16 threads, running the program with \texttt{-np 4} (4 MPI processes) resulted in each process attempting to utilize 16 threads, culminating in a total of 64 threads per machine. This behavior was contrary to the initial intention of allocating a fixed number of threads per process (e.g., 4 threads per process).
 
-As the number of MPI processes increased, the number of threads per process inadvertently decreased, leading to suboptimal utilization of the CPU cores and diminishing the expected speedup. This misconfiguration impeded the scalability of the MPI implementation, particularly noticeable when scaling beyond a single host.
+As the number of MPI processes increased, the number of threads per process inadvertently decreased, leading to suboptimal utilization of the CPU cores and diminishing the expected speedup. This misconfiguration impeded the scalability of the MPI implementation on single host, but showcases scaling with multiple hosts.
 
 \subsubsection{Speedup Analysis}
 
@@ -776,7 +810,10 @@ The performance of the MPI implementation was evaluated by measuring the speedup
 \begin{table}[H]
 	\centering
 	\captionsetup{justification=centering, width=.8\linewidth}
+	\rowcolors{2}{gray!25}{white}
 	\input{tables/mandelbrot_mpi_speedup_vs_processes.tex}
+	\rowcolors{1}{}{ }
+
 	\caption{Speedup of MPI Mandelbrot Computations with Varying Number of Processes Across Multiple Hosts.}
 	\label{tab:mandelbrot_mpi_speedup_vs_processes}
 \end{table}
@@ -846,19 +883,6 @@ The use of \texttt{omp\_get\_max\_threads()} without proper thread locking for c
 
 This results in clear openMPI overhead, as the number of threads per process decreases as the number of processes increases, leading to inefficient parallel execution and diminished returns on additional processes. This overhead of processes is visible on the Figure~\ref{fig:mandelbrot_mpi_speedup_vs_processes_bar} where going from 4 processes to 64 is is a regression of speedup because processes are put in place instead of threads.
 
-
-\subsubsection{Lessons Learned and Future Improvements}
-
-The performance issues encountered with the MPI implementation highlight the necessity of meticulous thread and process management in hybrid parallel computing environments. To address the observed challenges and enhance scalability, the following improvements are proposed:
-
-\begin{itemize}
-	\item \textbf{Resource Allocation Strategy:} Develop a resource allocation strategy that balances the number of MPI processes and OpenMP threads based on the underlying hardware capabilities, ensuring optimal utilization without overloading CPU cores.
-	\item \textbf{Hybrid Parallelism Optimization:} Explore hybrid parallelism techniques that effectively combine MPI and OpenMP, potentially leveraging MPI process pinning and affinity settings to enhance cache utilization and reduce communication overhead.
-	\item \textbf{Dynamic Load Balancing:} Investigate dynamic load balancing mechanisms to distribute computational tasks more evenly across MPI processes and threads, mitigating the impact of uneven workload distribution.
-\end{itemize}
-
-Implementing these strategies will enable more efficient scaling of the MPI implementation, unlocking the full potential of the HPC cluster for Mandelbrot Set computations and other parallel applications.
-
 \subsubsection{Conclusion of MPI Results}
 
 By addressing the thread management issues and adopting a more disciplined approach to resource allocation, future implementations can achieve more significant speedup and better scalability. The insights gained from this benchmarking exercise emphasize the critical interplay between MPI processes and OpenMP threads in hybrid parallel computing environments, guiding the optimization of parallel applications for maximum performance.
@@ -876,5 +900,58 @@ The MPI benchmarks revealed the following key insights:
 These findings underscore the importance of careful parallelism strategy design in MPI implementations, especially when integrating with multi-threaded approaches like OpenMP. Proper synchronization and resource management are pivotal in achieving efficient and scalable parallel computations in HPC environments.
 
 
+\section{Conclusion}
 
+This study comprehensively evaluated the performance of Mandelbrot Set computations across various High-Performance Computing (HPC) implementations, including sequential execution with different compilers, OpenMP parallelization, CUDA GPU acceleration, and MPI-based distributed computing. The primary objective was to assess the efficiency, scalability, and overall performance enhancements achieved through these diverse computational paradigms.
+
+\subsection{Sequential Execution: G++ vs. Clang based AOCC Compilers}
+
+The baseline sequential executions demonstrated that the AOCC compiler consistently outperformed the GCC compiler, achieving a 38-47\% speedup. This performance advantage can be attributed to AOCC's optimized code generation and superior exploitation of the CPU's SIMD (Single Instruction, Multiple Data) capabilities. However, it is noteworthy that the GCC compiler, despite being slightly less performant in this specific benchmark, remains a robust and widely-supported tool with extensive optimization flags and a strong community backing.
+
+\subsection{OpenMP Parallelization}
+
+The integration of OpenMP into the Mandelbrot computation yielded significant performance improvements. By leveraging shared-memory parallelism, the OpenMP implementation achieved substantial speedups, particularly when utilizing dynamic scheduling strategies. The dynamic scheduling demonstrated superior adaptability to varying thread counts, maintaining better performance scaling as the number of threads increased to 16. This adaptability underscores OpenMP's effectiveness in balancing computational loads and maximizing resource utilization, especially in scenarios with high parallelism demands.
+
+\subsection{CUDA GPU Acceleration}
+
+While the CUDA implementation showed promise in leveraging the GPU's parallel processing capabilities, its performance was notably hindered by certain implementation flaws. Specifically, the CUDA kernel utilized the \texttt{cuComplex} library and its associated functions (\texttt{cuCmul}, \texttt{cuCadd}), which introduced unnecessary computational overhead. Additionally, it is likely that not all relevant compiler flags were appropriately passed during the compilation process, further limiting the potential performance gains. Consequently, the CUDA implementation did not achieve the expected speedup and fell short compared to both the sequential and OpenMP-optimized executions. Addressing these issues by optimizing the kernel code and ensuring comprehensive compiler flag utilization could significantly enhance the CUDA implementation's performance in future endeavors.
+
+\subsection{MPI Distributed Computing}
+
+The MPI-based distributed computing approach aimed to scale the Mandelbrot computations across multiple hosts. However, the implementation encountered challenges related to resource management. Specifically, the use of \texttt{omp\_get\_max\_threads()} without proper thread locking led to oversubscription of CPU resources on each host. As a result, increasing the number of MPI processes inadvertently reduced the number of threads per process, leading to suboptimal performance and preventing the implementation from achieving the full expected scalability. This mismanagement highlights the critical importance of coordinated thread and process management in hybrid MPI/OpenMP environments to fully exploit the available computational resources.
+
+\subsection{Overall Insights and Future Directions}
+
+The comparative analysis of the various HPC implementations underscores the substantial performance gains achievable through parallelization and compiler optimizations. OpenMP emerged as a highly effective parallelization strategy, offering significant speedups and excellent scalability when appropriately configured. In contrast, the CUDA implementation's performance was constrained by implementation inefficiencies and incomplete optimization, suggesting a need for more refined kernel development and comprehensive compiler flag utilization.
+
+The MPI implementation, while theoretically promising for distributed computing, was hampered by resource oversubscription issues. Future work should focus on implementing stricter control over thread allocation per MPI process, possibly through environment variables such as \texttt{OMP\_NUM\_THREADS} or programmatic thread management, to prevent oversubscription and enhance scalability.
+
+Moreover, exploring hybrid parallelization techniques that seamlessly integrate MPI and OpenMP, coupled with advanced optimization strategies for both CPU and GPU implementations, could unlock further performance enhancements. Investigating alternative libraries or custom implementations for complex arithmetic in CUDA, as well as experimenting with different compiler flags and optimization levels, may also yield significant improvements.
+
+In conclusion, this study highlights the critical role of careful implementation and optimization in achieving optimal performance in HPC applications. While parallelization frameworks like OpenMP and MPI offer powerful tools for accelerating computations, their effectiveness is contingent upon meticulous resource management and tailored optimization strategies. Addressing the identified challenges in CUDA and MPI implementations will pave the way for more efficient and scalable Mandelbrot Set computations and similar computationally intensive tasks in future HPC projects.
+
+\section{References}
+
+\begin{thebibliography}{9}
+	\bibitem{mandelbrot}
+	wikiHow. (2023). \textit{Plotting the Mandelbrot Set by Hand: A Simple How-To Guide}. Retrieved from \url{https://www.wikihow.com/Plot-the-Mandelbrot-Set-By-Hand}
+
+	\bibitem{openmp}
+	OpenMP Architecture Review Board. (2023). \textit{OpenMP Application Programming Interface Version 5.1}. Retrieved from \url{https://www.openmp.org/specifications/}
+
+	\bibitem{mpi}
+	Message Passing Interface Forum. (2020). \textit{MPI: A Message-Passing Interface Standard}. Retrieved from \url{https://www.mpi-forum.org/docs/mpi-4.0/mpi40-report.pdf}
+
+	\bibitem{cuda}
+	NVIDIA Corporation. (2023). \textit{CUDA C++ Programming Guide}. Retrieved from \url{https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html}
+
+	\bibitem{aocc}
+	AMD Optimizing C/C++ Compiler (AOCC). (2023). Retrieved from \url{https://www.amd.com/en/developer/aocc.html}
+
+	\bibitem{github}
+	Szymon Zinkowicz github repository. (2024). \textit{HPC-AMD-Mandelbrot-Parallelization}. GitHub repository. Retrieved from \url{https://github.com/Siponek/HPC-AMD-Mandelbrot-Parallelization}
+
+	% Add additional references as needed
+
+\end{thebibliography}
 \end{document}
